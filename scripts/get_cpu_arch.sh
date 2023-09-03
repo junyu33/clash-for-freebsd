@@ -32,6 +32,10 @@ if [[ -f "/etc/os-release" ]]; then
             # Red Hat-based distributions
             CpuArch=$(get_cpu_arch "uname -m" "arch" "uname")
             ;;
+	"freebsd"|"openbsd")
+	    # BSD distribution like freeBSD, openBSD, etc.
+	    CpuArch=$(uname -m)
+	    ;;
         *)
             # Unsupported Linux distribution
             CpuArch=$(get_cpu_arch "uname -m" "arch" "uname")

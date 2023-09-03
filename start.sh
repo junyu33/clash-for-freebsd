@@ -17,6 +17,19 @@ chmod +x $Server_Dir/scripts/*
 chmod +x $Server_Dir/tools/subconverter/subconverter
 
 
+if [[ -f "/etc/os-release" ]]; then
+     . /etc/os-release
+     case "$ID" in
+	 "freebsd"|"openbsd")
+	     export isBSD=true
+	 ;;
+ 	 *)
+	     export isBSD=false
+	 ;;
+     esac
+fi
+
+
 
 #################### 变量设置 ####################
 
@@ -63,9 +76,9 @@ action() {
 if_success() {
 	local ReturnStatus=$3
 	if [ $ReturnStatus -eq 0 ]; then
-		action "$1" /bin/true
+		action "$1" /usr/bin/true
 	else
-		action "$2" /bin/false
+		action "$2" /usr/bin/false
 		exit 1
 	fi
 }
@@ -152,8 +165,14 @@ cat $Temp_Dir/proxy.txt >> $Temp_Dir/config.yaml
 # Configure Clash Dashboard
 Work_Dir=$(cd $(dirname $0); pwd)
 Dashboard_Dir="${Work_Dir}/dashboard/public"
-sed -ri "s@^# external-ui:.*@external-ui: ${Dashboard_Dir}@g" $Conf_Dir/config.yaml
-sed -r -i '/^secret: /s@(secret: ).*@\1'${Secret}'@g' $Conf_Dir/config.yaml
+
+if [[ $isBSD == false ]]; then
+    sed -ri "s@^# external-ui:.*@external-ui: ${Dashboard_Dir}@g" $Conf_Dir/config.yaml
+    sed -r -i '/^secret: /s@(secret: ).*@\1'${Secret}'@g' $Conf_Dir/config.yaml
+else
+    sed -i "" -e "s@^# external-ui:.*@external-ui: ${Dashboard_Dir}@g" "$Conf_Dir/config.yaml"
+    sed -E -i "" -e '/^secret: /s@(secret: ).*@\1'"${Secret}"'@g' "$Conf_Dir/config.yaml"
+fi
 
 
 ## 启动Clash服务
@@ -161,7 +180,11 @@ echo -e '\n正在启动Clash服务...'
 Text5="服务启动成功！"
 Text6="服务启动失败！"
 if [[ $CpuArch =~ "x86_64" || $CpuArch =~ "amd64"  ]]; then
-	nohup $Server_Dir/bin/clash-linux-amd64 -d $Conf_Dir &> $Log_Dir/clash.log &
+	if [[ $isBSD == true ]]; then
+	    nohup $Server_Dir/bin/clash-freebsd-amd64 -d $Conf_Dir &> $Log_Dir/clash.log &
+        else	    
+	    nohup $Server_Dir/bin/clash-linux-amd64 -d $Conf_Dir &> $Log_Dir/clash.log &
+	fi
 	ReturnStatus=$?
 	if_success $Text5 $Text6 $ReturnStatus
 elif [[ $CpuArch =~ "aarch64" ||  $CpuArch =~ "arm64" ]]; then

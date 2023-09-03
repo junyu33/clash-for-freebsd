@@ -2,14 +2,15 @@
 
 # 项目介绍
 
-此项目是通过使用开源项目[clash](https://github.com/Dreamacro/clash)作为核心程序，再结合脚本实现简单的代理功能。
+This is a fork from `wanhebin/clash-for-linux`, I added support for freeBSD.
 
-主要是为了解决我们在服务器上下载GitHub等一些国外资源速度慢的问题。
+Tested on `FreeBSD-13.2-RELEASE` and `zsh-5.9`.
 
 <br>
 
 # 使用须知
 
+- Please turn on Linux Binary Compabtibility at [FreeBSD handbook](https://docs.freebsd.org/en/books/handbook/linuxemu/)
 - 运行本项目建议使用root用户，或者使用 sudo 提权。
 - 使用过程中如遇到问题，请优先查已有的 [issues](https://github.com/wanhebin/clash-for-linux/issues)。
 - 在进行issues提交前，请替换提交内容中是敏感信息（例如：订阅地址）。
